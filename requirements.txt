@@ -1,0 +1,3 @@
+pandas
+PyInstaller
+PyQt5
