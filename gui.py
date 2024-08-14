@@ -67,6 +67,11 @@ class BELComparatorApp(QWidget):
         self.error_count_label = QLabel("Errors: 0")
         bottom_layout.addWidget(self.error_count_label, alignment=Qt.AlignRight)
 
+        # CSV 내보내기 버튼을 추가
+        self.export_button = QPushButton('CSV 내보내기')
+        self.export_button.clicked.connect(self.export_csv)
+        bottom_layout.addWidget(self.export_button, alignment=Qt.AlignRight)
+
         layout.addLayout(bottom_layout)
 
         self.setLayout(layout)
@@ -139,6 +144,9 @@ class BELComparatorApp(QWidget):
 
             result = comparator.compare_bel()
 
+            # 결과를 인스턴스 변수로 저장
+            self.result_df = result.copy()
+
             # 테이블 초기화 및 결과 표시
             self.result_table.clear()
             self.result_table.setRowCount(len(result))
@@ -156,8 +164,11 @@ class BELComparatorApp(QWidget):
                     width = font_metrics.width(str(value)) + 10
                     self.result_table.setColumnWidth(col_idx, max(self.result_table.columnWidth(col_idx), width))
 
-                # DIFF가 0이 아니거나 NaN일 때, error_count 증가
-                if pd.isna(row['DIFF']) or float(row['DIFF']) != 0:
+                # DIFF가 NaN이거나, 변환이 불가능할 때 error_count 증가
+                try:
+                    if pd.isna(row['DIFF']) or float(row['DIFF']) != 0:
+                        error_count += 1
+                except ValueError:
                     error_count += 1
 
                 # Update ProgressBar
@@ -172,6 +183,19 @@ class BELComparatorApp(QWidget):
             self.log_to_console(f"오류 발생: {str(e)}")
         except Exception as e:
             self.log_to_console(f"예기치 않은 오류 발생: {str(e)}")
+
+    def export_csv(self):
+        """결과 데이터를 CSV로 내보내기"""
+        try:
+            if hasattr(self, 'result_df') and not self.result_df.empty:
+                file_name, _ = QFileDialog.getSaveFileName(self, "Export CSV", "", "CSV Files (*.csv);;All Files (*)")
+                if file_name:
+                    self.result_df.to_csv(file_name, index=False)
+                    self.log_to_console(f"CSV 파일로 내보내기 완료: {file_name}")
+            else:
+                self.log_to_console("내보낼 데이터가 없습니다. 먼저 BEL 비교를 실행하세요.")
+        except Exception as e:
+            self.log_to_console(f"CSV 내보내기 오류: {str(e)}")
 
     def handle_header_click(self, logicalIndex):
         """헤더 클릭 시 정렬 순서를 번갈아 가며 변경"""
