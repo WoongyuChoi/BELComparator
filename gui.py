@@ -1,4 +1,8 @@
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QTextEdit, QFileDialog, QLabel, QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
+import pandas as pd
+from PyQt5.QtWidgets import (
+    QWidget, QVBoxLayout, QPushButton, QTextEdit, QFileDialog, QLabel,
+    QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView, QProgressBar, QHBoxLayout
+)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFontMetrics
 from bel_comparator import BELComparator
@@ -46,6 +50,24 @@ class BELComparatorApp(QWidget):
         self.console_output.setReadOnly(True)
         self.console_output.setMaximumHeight(150)  # 콘솔 창의 최대 높이 설정
         layout.addWidget(self.console_output)
+
+        # 하단에 ProgressBar와 카운트 정보를 표시할 레이아웃 추가
+        bottom_layout = QHBoxLayout()
+
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setTextVisible(True)
+        bottom_layout.addWidget(self.progress_bar)
+
+        self.pw_count_label = QLabel("Pathwise Count: 0")
+        bottom_layout.addWidget(self.pw_count_label, alignment=Qt.AlignRight)
+
+        self.inno_count_label = QLabel("Innolink Count: 0")
+        bottom_layout.addWidget(self.inno_count_label, alignment=Qt.AlignRight)
+
+        self.error_count_label = QLabel("Errors: 0")
+        bottom_layout.addWidget(self.error_count_label, alignment=Qt.AlignRight)
+
+        layout.addLayout(bottom_layout)
 
         self.setLayout(layout)
         self.setWindowTitle('BEL Comparator')
@@ -110,6 +132,11 @@ class BELComparatorApp(QWidget):
 
             comparator = BELComparator(self.inno_df, self.pw_df, bel_values)
             comparator.validate_and_prepare_data()
+
+            # ProgressBar 시작
+            self.progress_bar.setMaximum(len(self.pw_df))
+            self.progress_bar.setValue(0)
+
             result = comparator.compare_bel()
 
             # 테이블 초기화 및 결과 표시
@@ -120,12 +147,25 @@ class BELComparatorApp(QWidget):
 
             font_metrics = QFontMetrics(self.result_table.font())
 
+            error_count = 0
+
             for row_idx, row in result.iterrows():
                 for col_idx, value in enumerate(row):
                     item = QTableWidgetItem(str(value))
                     self.result_table.setItem(row_idx, col_idx, item)
                     width = font_metrics.width(str(value)) + 10
                     self.result_table.setColumnWidth(col_idx, max(self.result_table.columnWidth(col_idx), width))
+
+                # DIFF가 0이 아니거나 NaN일 때, error_count 증가
+                if pd.isna(row['DIFF']) or float(row['DIFF']) != 0:
+                    error_count += 1
+
+                # Update ProgressBar
+                self.progress_bar.setValue(row_idx + 1)
+
+            self.pw_count_label.setText(f"Pathwise Count: {len(self.pw_df)}")
+            self.inno_count_label.setText(f"Innolink Count: {len(self.inno_df)}")
+            self.error_count_label.setText(f"Errors: {error_count}")
 
             self.log_to_console("BEL 비교 완료.")
         except (MissingColumnsError, InvalidBELValuesError) as e:
