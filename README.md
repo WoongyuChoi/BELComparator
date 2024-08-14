@@ -16,7 +16,7 @@
 1. **저장소 복제:**
 
    ```bash
-   git clone https://github.WoongyuChoi/BELComparator.git
+   git clone [https://github.WoongyuChoi/BELComparator.git](https://github.com/WoongyuChoi/BELComparator.git)
    cd BELComparator
    ```
 
