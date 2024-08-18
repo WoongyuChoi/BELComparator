@@ -1,5 +1,5 @@
 import pandas as pd
-from custom_exceptions import MissingColumnsError, InvalidBELValuesError
+from bel_comparator.custom_exceptions import MissingColumnsError, InvalidBELValuesError
 
 class BELComparator:
     def __init__(self, inno_df, pw_df, bel_values):
