@@ -1,0 +1,74 @@
+from PyQt5.QtWidgets import QVBoxLayout, QLabel, QPushButton, QTextEdit, QTableWidget, QProgressBar, QHBoxLayout, QAbstractItemView
+from PyQt5.QtCore import Qt
+
+def init_ui(app_instance):
+    """UI를 초기화하는 함수"""
+    layout = QVBoxLayout()
+
+    layout.addWidget(QLabel("Innolink CSV 파일 선택"))
+    app_instance.inno_button = QPushButton('Browse Innolink CSV')
+    app_instance.inno_button.clicked.connect(app_instance.load_inno_csv)
+    layout.addWidget(app_instance.inno_button)
+
+    layout.addWidget(QLabel("Pathwise CSV 파일 선택"))
+    app_instance.pw_button = QPushButton('Browse Pathwise CSV')
+    app_instance.pw_button.clicked.connect(app_instance.load_pw_csv)
+    layout.addWidget(app_instance.pw_button)
+
+    layout.addWidget(QLabel("BEL 값 입력"))
+    app_instance.bel_input = QTextEdit()
+    layout.addWidget(app_instance.bel_input)
+
+    app_instance.compare_button = QPushButton('BEL 비교')
+    app_instance.compare_button.clicked.connect(app_instance.compare_bel)
+    layout.addWidget(app_instance.compare_button)
+
+    layout.addWidget(QLabel("비교 결과"))
+    app_instance.result_table = QTableWidget()
+    app_instance.result_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+    app_instance.result_table.horizontalHeader().setSectionsClickable(True)
+    app_instance.result_table.horizontalHeader().setSortIndicatorShown(True)
+    app_instance.result_table.horizontalHeader().sectionClicked.connect(app_instance.handle_header_click)
+    layout.addWidget(app_instance.result_table)
+
+    layout.addWidget(QLabel("콘솔 출력"))
+    app_instance.console_output = QTextEdit()
+    app_instance.console_output.setReadOnly(True)
+    app_instance.console_output.setMaximumHeight(150)
+    layout.addWidget(app_instance.console_output)
+
+    bottom_layout = QHBoxLayout()
+    app_instance.progress_bar = QProgressBar()
+    app_instance.progress_bar.setTextVisible(True)
+    bottom_layout.addWidget(app_instance.progress_bar)
+
+    app_instance.pw_count_label = QLabel("Pathwise Count: 0")
+    bottom_layout.addWidget(app_instance.pw_count_label, alignment=Qt.AlignRight)
+
+    app_instance.inno_count_label = QLabel("Innolink Count: 0")
+    bottom_layout.addWidget(app_instance.inno_count_label, alignment=Qt.AlignRight)
+
+    app_instance.error_count_label = QLabel("Errors: 0")
+    bottom_layout.addWidget(app_instance.error_count_label, alignment=Qt.AlignRight)
+
+    app_instance.export_button = QPushButton('CSV 내보내기')
+    app_instance.export_button.clicked.connect(app_instance.export_csv)
+    bottom_layout.addWidget(app_instance.export_button, alignment=Qt.AlignRight)
+
+    layout.addLayout(bottom_layout)
+    app_instance.setLayout(layout)
+    app_instance.setWindowTitle('BEL Comparator')
+
+    app_instance.resize(1200, 900)
+    center(app_instance)
+
+def center(app_instance):
+    """화면 중앙에 윈도우를 배치하는 함수"""
+    qr = app_instance.frameGeometry()
+    cp = app_instance.screen().availableGeometry().center()
+    qr.moveCenter(cp)
+    app_instance.move(qr.topLeft())
+
+def log_to_console(app_instance, message):
+    """콘솔 창에 로그 메시지를 출력하는 함수"""
+    app_instance.console_output.append(message)
