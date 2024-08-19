@@ -36,8 +36,12 @@ class BELComparator:
         if missing_pw_columns:
             raise MissingColumnsError(f"Pathwise CSV 파일에 '{', '.join(missing_pw_columns)}' 컬럼이 없습니다.")
 
-        if len(self.bel_values) != len(self.inno_df):
-            raise InvalidBELValuesError(f"입력된 BEL 값의 개수({len(self.bel_values)})가 Innolink CSV 파일의 행 개수({len(self.inno_df)})와 일치하지 않습니다.")
+        # BEL 값의 개수가 inno_df의 행 개수보다 적으면 NaN으로 채움
+        if len(self.bel_values) < len(self.inno_df):
+            self.bel_values.extend([pd.NA] * (len(self.inno_df) - len(self.bel_values)))
+
+        # BEL 값의 개수가 많으면 잘라냄
+        self.bel_values = self.bel_values[:len(self.inno_df)]
 
         self.inno_df.columns = [col.upper() for col in self.inno_df.columns]
         self.pw_df.columns = [col.upper() for col in self.pw_df.columns]
