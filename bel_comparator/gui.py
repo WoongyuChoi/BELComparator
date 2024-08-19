@@ -15,6 +15,7 @@ class BELComparatorApp(QWidget):
         self.sort_order = Qt.AscendingOrder
         self.last_memory_check_time = 0
         self.cached_chunksize = None
+        self.adjustment_factor = 0.001  # 기본 허용오차 설정
         ui_setup.init_ui(self)
 
     def center(self):
@@ -68,8 +69,14 @@ class BELComparatorApp(QWidget):
             self.inno_df.columns = [col.upper() for col in self.inno_df.columns]
             self.pw_df.columns = [col.upper() for col in self.pw_df.columns]
 
+            # 조정계수 값 읽기 및 유효성 검사
+            self.adjustment_factor = float(self.adjustment_input.text().strip())
+            if self.adjustment_factor < 0.000001 or self.adjustment_factor > 1:
+                self.log_to_console("조정계수는 0.000001 이상 1 이하의 값이어야 합니다.")
+                return
+
             result, error_count = data_processing.compare_bel(
-                self.inno_df, self.pw_df, bel_values, self.progress_bar, self.log_to_console
+                self.inno_df, self.pw_df, bel_values, self.progress_bar, self.log_to_console, self.adjustment_factor
             )
 
             if result is not None:

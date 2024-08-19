@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QVBoxLayout, QLabel, QPushButton, QTextEdit, QTableWidget, QProgressBar, QHBoxLayout, QAbstractItemView
+from PyQt5.QtWidgets import QVBoxLayout, QLabel, QPushButton, QTextEdit, QTableWidget, QProgressBar, QHBoxLayout, QAbstractItemView, QLineEdit
 from PyQt5.QtCore import Qt
 
 def init_ui(app_instance):
@@ -19,9 +19,19 @@ def init_ui(app_instance):
     app_instance.bel_input = QTextEdit()
     layout.addWidget(app_instance.bel_input)
 
+    # 허용오차 입력란과 BEL 비교 버튼을 같은 행에 배치
+    adjustment_layout = QHBoxLayout()
+    
+    adjustment_layout.addWidget(QLabel("허용오차 입력 (기본값: 0.001)"))
+    app_instance.adjustment_input = QLineEdit()
+    app_instance.adjustment_input.setText("0.001")  # 기본값 설정
+    adjustment_layout.addWidget(app_instance.adjustment_input, 1)  # 비율 1
+
     app_instance.compare_button = QPushButton('BEL 비교')
     app_instance.compare_button.clicked.connect(app_instance.compare_bel)
-    layout.addWidget(app_instance.compare_button)
+    adjustment_layout.addWidget(app_instance.compare_button, 1)  # 비율 1
+
+    layout.addLayout(adjustment_layout)
 
     layout.addWidget(QLabel("비교 결과"))
     app_instance.result_table = QTableWidget()
