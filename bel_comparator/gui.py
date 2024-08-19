@@ -102,13 +102,13 @@ class BELComparatorApp(QWidget):
             self.inno_df.columns = [col.upper() for col in self.inno_df.columns]
             self.pw_df.columns = [col.upper() for col in self.pw_df.columns]
 
-            # 조정계수 값 읽기 및 유효성 검사
+            # 허용오차 값 읽기 및 유효성 검사
             adjustment_factor_str = self.adjustment_input.text().strip()
             adjustment_factor = 0.001
             if adjustment_factor_str:
                 adjustment_factor = float(adjustment_factor_str)            
                 if adjustment_factor < 0.000001 or adjustment_factor > 1:
-                    self.log_to_console("조정계수는 0.000001 이상 1 이하의 값이어야 합니다.")
+                    self.log_to_console("허용오차는 0.000001 이상 1 이하의 값이어야 합니다.")
                     return
 
             result, error_count = data_processing.compare_bel(

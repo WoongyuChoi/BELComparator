@@ -18,7 +18,6 @@ def compare_bel(inno_df, pw_df, bel_values, progress_bar, log_to_console, adjust
             try:
                 # 조정계수 적용: DIFF가 조정계수보다 작으면 일치하는 것으로 간주
                 diff_value = abs(float(row['DIFF']))
-                log_to_console(f"DIFF: {diff_value}, Adjustment Factor: {adjustment_factor}")
                 # 조정계수 적용: DIFF가 조정계수보다 크면 오류로 간주
                 if pd.isna(row['DIFF']) or diff_value > adjustment_factor:
                     error_count += 1
