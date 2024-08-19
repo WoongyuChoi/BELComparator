@@ -1,4 +1,7 @@
-from PyQt5.QtWidgets import QVBoxLayout, QLabel, QPushButton, QTextEdit, QTableWidget, QProgressBar, QHBoxLayout, QAbstractItemView, QLineEdit
+from PyQt5.QtWidgets import (
+    QVBoxLayout, QLabel, QPushButton, QTextEdit, QTableWidget,
+    QProgressBar, QHBoxLayout, QAbstractItemView, QLineEdit, QSpacerItem, QSizePolicy
+)
 from PyQt5.QtCore import Qt
 
 def init_ui(app_instance):
@@ -15,16 +18,40 @@ def init_ui(app_instance):
     app_instance.pw_button.clicked.connect(app_instance.load_pw_csv)
     layout.addWidget(app_instance.pw_button)
 
+    # BEL 값 입력란
     layout.addWidget(QLabel("BEL 값 입력"))
     app_instance.bel_input = QTextEdit()
     layout.addWidget(app_instance.bel_input)
+
+    # 데이터 범위 설정 입력란
+    range_layout_container = QHBoxLayout()  # 전체 레이아웃을 감싸는 컨테이너
+    empty_space_layout = QHBoxLayout()  # 빈 공간을 채우기 위한 레이아웃
+    range_layout = QHBoxLayout()  # 실제로 데이터를 입력받는 레이아웃
+    
+    range_layout.addWidget(QLabel("데이터 범위 설정"))
+    app_instance.start_input = QLineEdit()
+    app_instance.start_input.setPlaceholderText("시작 (기본값: 0)")
+    range_layout.addWidget(app_instance.start_input)
+
+    range_layout.addWidget(QLabel(" ~ "))  # 물결 기호
+
+    app_instance.end_input = QLineEdit()
+    app_instance.end_input.setPlaceholderText("종료 (기본값: 최대값)")
+    range_layout.addWidget(app_instance.end_input)
+
+    # SpacerItem을 사용하여 빈 공간을 채움
+    spacer = QSpacerItem(300, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+    range_layout_container.addLayout(range_layout, stretch=1)
+    range_layout_container.addSpacerItem(spacer)
+
+    layout.addLayout(range_layout_container)
 
     # 허용오차 입력란과 BEL 비교 버튼을 같은 행에 배치
     adjustment_layout = QHBoxLayout()
     
     adjustment_layout.addWidget(QLabel("허용오차 입력 (기본값: 0.001)"))
     app_instance.adjustment_input = QLineEdit()
-    app_instance.adjustment_input.setText("0.001")  # 기본값 설정
+    app_instance.adjustment_input.setPlaceholderText("0.001")
     adjustment_layout.addWidget(app_instance.adjustment_input, 1)  # 비율 1
 
     app_instance.compare_button = QPushButton('BEL 비교')

@@ -15,7 +15,6 @@ class BELComparatorApp(QWidget):
         self.sort_order = Qt.AscendingOrder
         self.last_memory_check_time = 0
         self.cached_chunksize = None
-        self.adjustment_factor = 0.001  # 기본 허용오차 설정
         ui_setup.init_ui(self)
 
     def center(self):
@@ -64,19 +63,56 @@ class BELComparatorApp(QWidget):
             if not bel_input_text:
                 self.log_to_console("BEL 값을 입력하세요.")
                 return
+            
+            # 데이터 범위 입력 값 검증 및 설정
+            start_str = self.start_input.text().strip()
+            end_str = self.end_input.text().strip()
 
+            # 기본값 설정
+            start = 0
+            end = len(self.inno_df)
+
+            # start 값 검증 및 설정
+            if start_str:
+                if start_str.isdigit():
+                    start = int(start_str)
+                    if start < 0:
+                        self.log_to_console("시작 값은 0 이상이어야 합니다.")
+                        return
+                else:
+                    self.log_to_console("시작 값은 정수여야 합니다.")
+                    return
+
+            # end 값 검증 및 설정
+            if end_str:
+                if end_str.isdigit():
+                    end = int(end_str)
+                    if end > len(self.inno_df):
+                        end = len(self.inno_df)  # 최대 값으로 설정
+                    if end < start:
+                        self.log_to_console("종료 값은 시작 값보다 크거나 같아야 합니다.")
+                        return
+                else:
+                    self.log_to_console("종료 값은 정수여야 합니다.")
+                    return
+
+            # 데이터 프레임 자르기
+            self.inno_df = self.inno_df.iloc[start:end + 1]
             bel_values = BELComparator.parse_bel_values(bel_input_text)
             self.inno_df.columns = [col.upper() for col in self.inno_df.columns]
             self.pw_df.columns = [col.upper() for col in self.pw_df.columns]
 
             # 조정계수 값 읽기 및 유효성 검사
-            self.adjustment_factor = float(self.adjustment_input.text().strip())
-            if self.adjustment_factor < 0.000001 or self.adjustment_factor > 1:
-                self.log_to_console("조정계수는 0.000001 이상 1 이하의 값이어야 합니다.")
-                return
+            adjustment_factor_str = self.adjustment_input.text().strip()
+            adjustment_factor = 0.001
+            if adjustment_factor_str:
+                adjustment_factor = float(adjustment_factor_str)            
+                if adjustment_factor < 0.000001 or adjustment_factor > 1:
+                    self.log_to_console("조정계수는 0.000001 이상 1 이하의 값이어야 합니다.")
+                    return
 
             result, error_count = data_processing.compare_bel(
-                self.inno_df, self.pw_df, bel_values, self.progress_bar, self.log_to_console, self.adjustment_factor
+                self.inno_df, self.pw_df, bel_values, self.progress_bar, self.log_to_console, adjustment_factor
             )
 
             if result is not None:
