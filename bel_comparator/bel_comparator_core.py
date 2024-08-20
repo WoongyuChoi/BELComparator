@@ -12,16 +12,24 @@ class BELComparator:
         """입력된 BEL 텍스트를 파싱하여 숫자 리스트로 반환합니다."""
         bel_lines = bel_text.strip().splitlines()
         bel_values = []
+
+        # 첫 번째 줄 처리
+        if bel_lines:
+            first_line = bel_lines[0].strip()
+            if first_line.isalpha():
+                bel_lines = bel_lines[1:]  # 첫 번째 줄을 제거
+
         for line in bel_lines:
             line = line.strip()
             try:
-                # BEL이라는 문자열은 무시하고 숫자만 처리
-                if line and not line.isalpha():
+                if line:
                     bel_values.append(float(line))
             except ValueError:
-                continue  # 변환이 안 되는 경우 무시
+                bel_values.append(pd.NA)  # 변환이 안 되는 경우 NaN으로 처리
+        
         if not bel_values:
             raise InvalidBELValuesError("잘못된 BEL 값이 입력되었습니다.")
+        
         return bel_values
 
     def validate_and_prepare_data(self):
