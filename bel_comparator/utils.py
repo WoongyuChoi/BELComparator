@@ -45,3 +45,11 @@ def load_csv_with_chunksize(file_name, chunksize):
     chunks = pd.read_csv(file_name, chunksize=chunksize)
     df = pd.concat(chunk for chunk in chunks)
     return df
+
+def is_valid_float(value):
+    """값이 유효한 float으로 변환 가능한지 확인하는 함수"""
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
