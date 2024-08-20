@@ -61,6 +61,10 @@ class BELComparator:
         """열의 값을 포맷팅합니다."""
         return f"{value:.6f}" if pd.notna(value) else ""
 
+    def format_diff_column(self, value):
+        """DIFF 열의 값을 포맷팅합니다."""
+        return f"{value:.6f}" if pd.notna(value) else 'NaN'
+
     def compare_bel(self):
         """Innolink와 Pathwise 데이터를 비교하여 결과를 반환합니다."""
         try:
@@ -86,7 +90,7 @@ class BELComparator:
             merged_df['RIDER_PRD_CODE'] = merged_df['RIDER_PRD_CODE'].astype(str)
             merged_df['PATHWISE_BEL'] = merged_df['BEL'].apply(self.format_column)
             merged_df['INNOLINC_BEL'] = merged_df['INNOLINC_BEL'].apply(self.format_column)
-            merged_df['DIFF'] = merged_df['DIFF'].apply(self.format_column)
+            merged_df['DIFF'] = merged_df['DIFF'].apply(self.format_diff_column)
 
             # 최종 결과를 반환합니다.
             result = merged_df[['ROW', 'INDEX', 'POL_NO', 'RIDER_PRD_CODE', 'PATHWISE_BEL', 'INNOLINC_BEL', 'DIFF']]

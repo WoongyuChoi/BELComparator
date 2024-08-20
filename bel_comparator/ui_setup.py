@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import (
     QVBoxLayout, QLabel, QPushButton, QTextEdit, QTableWidget,
-    QProgressBar, QHBoxLayout, QAbstractItemView, QLineEdit, QSpacerItem, QSizePolicy
+    QProgressBar, QHBoxLayout, QAbstractItemView, QLineEdit,
+    QRadioButton, QButtonGroup, QCheckBox
 )
 from PyQt5.QtCore import Qt
 
@@ -23,11 +24,11 @@ def init_ui(app_instance):
     app_instance.bel_input = QTextEdit()
     layout.addWidget(app_instance.bel_input)
 
+    # 데이터 범위 설정 입력란과 라디오 버튼, 체크박스 그룹을 같은 행에 배치
+    range_and_options_layout = QHBoxLayout()
+
     # 데이터 범위 설정 입력란
-    range_layout_container = QHBoxLayout()  # 전체 레이아웃을 감싸는 컨테이너
-    empty_space_layout = QHBoxLayout()  # 빈 공간을 채우기 위한 레이아웃
-    range_layout = QHBoxLayout()  # 실제로 데이터를 입력받는 레이아웃
-    
+    range_layout = QHBoxLayout()
     range_layout.addWidget(QLabel("데이터 범위 설정"))
     app_instance.start_input = QLineEdit()
     app_instance.start_input.setPlaceholderText("시작 (기본값: 0)")
@@ -39,26 +40,49 @@ def init_ui(app_instance):
     app_instance.end_input.setPlaceholderText("종료 (기본값: 최대값)")
     range_layout.addWidget(app_instance.end_input)
 
-    # SpacerItem을 사용하여 빈 공간을 채움
-    spacer = QSpacerItem(300, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-    range_layout_container.addLayout(range_layout, stretch=1)
-    range_layout_container.addSpacerItem(spacer)
+    range_and_options_layout.addLayout(range_layout, stretch=6)
 
-    layout.addLayout(range_layout_container)
+    # 라디오 버튼 및 체크박스 레이아웃 추가
+    options_layout = QHBoxLayout()
+
+    app_instance.radio_group = QButtonGroup(app_instance)
+    app_instance.all_radio = QRadioButton("전체조회")
+    app_instance.diff_radio = QRadioButton("오차조회")
+    app_instance.all_radio.setChecked(True)  # 기본으로 전체조회 선택
+
+    app_instance.radio_group.addButton(app_instance.all_radio)
+    app_instance.radio_group.addButton(app_instance.diff_radio)
+
+    options_layout.addWidget(app_instance.all_radio)
+    options_layout.addWidget(app_instance.diff_radio)
+
+    app_instance.na_checkbox = QCheckBox("N/A 제외")
+    options_layout.addWidget(app_instance.na_checkbox)
+
+    range_and_options_layout.addLayout(options_layout, stretch=4)
+
+    layout.addLayout(range_and_options_layout)
 
     # 허용오차 입력란과 BEL 비교 버튼을 같은 행에 배치
+    adjustment_and_button_layout = QHBoxLayout()
+
     adjustment_layout = QHBoxLayout()
-    
     adjustment_layout.addWidget(QLabel("허용오차 입력 (기본값: 0.001)"))
     app_instance.adjustment_input = QLineEdit()
     app_instance.adjustment_input.setPlaceholderText("0.001")
-    adjustment_layout.addWidget(app_instance.adjustment_input, 1)  # 비율 1
+    adjustment_layout.addWidget(app_instance.adjustment_input)    
+    
+    adjustment_and_button_layout.addLayout(adjustment_layout, stretch=6)
 
+    # BEL 비교 버튼
+    compare_button_layout = QHBoxLayout()
     app_instance.compare_button = QPushButton('BEL 비교')
     app_instance.compare_button.clicked.connect(app_instance.compare_bel)
-    adjustment_layout.addWidget(app_instance.compare_button, 1)  # 비율 1
+    compare_button_layout.addWidget(app_instance.compare_button)
 
-    layout.addLayout(adjustment_layout)
+    adjustment_and_button_layout.addLayout(compare_button_layout, stretch=4)
+
+    layout.addLayout(adjustment_and_button_layout)
 
     layout.addWidget(QLabel("비교 결과"))
     app_instance.result_table = QTableWidget()
