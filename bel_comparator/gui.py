@@ -34,18 +34,18 @@ class BELComparatorApp(QWidget):
         ui_setup.log_to_console(self, message)
 
     def load_inno_csv(self):
-        file_name, _ = QFileDialog.getOpenFileName(self, "Select Innolink CSV File", "", "CSV Files (*.csv);;All Files (*)")
+        file_name, _ = QFileDialog.getOpenFileName(self, "Select First CSV File", "", "CSV Files (*.csv);;All Files (*)")
         if file_name:
             self.inno_csv_path = file_name
-            self.inno_button.setText(f"Innolink CSV: {file_name}")
+            self.inno_button.setText(f"First CSV: {file_name}")
             self.cached_chunksize, self.last_memory_check_time = utils.calculate_dynamic_chunksize(
                 self.last_memory_check_time, self.cached_chunksize)
 
     def load_pw_csv(self):
-        file_name, _ = QFileDialog.getOpenFileName(self, "Select Pathwise CSV File", "", "CSV Files (*.csv);;All Files (*)")
+        file_name, _ = QFileDialog.getOpenFileName(self, "Select Second CSV File", "", "CSV Files (*.csv);;All Files (*)")
         if file_name:
             self.pw_csv_path = file_name
-            self.pw_button.setText(f"Pathwise CSV: {file_name}")
+            self.pw_button.setText(f"Second CSV: {file_name}")
             self.cached_chunksize, self.last_memory_check_time = utils.calculate_dynamic_chunksize(
                 self.last_memory_check_time, self.cached_chunksize)
 

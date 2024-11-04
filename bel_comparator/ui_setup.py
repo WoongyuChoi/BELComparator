@@ -9,13 +9,13 @@ def init_ui(app_instance):
     """UI를 초기화하는 함수"""
     layout = QVBoxLayout()
 
-    layout.addWidget(QLabel("Innolink CSV 파일 선택"))
-    app_instance.inno_button = QPushButton('Browse Innolink CSV')
+    layout.addWidget(QLabel("Select First CSV File"))
+    app_instance.inno_button = QPushButton('Browse First CSV')
     app_instance.inno_button.clicked.connect(app_instance.load_inno_csv)
     layout.addWidget(app_instance.inno_button)
 
-    layout.addWidget(QLabel("Pathwise CSV 파일 선택"))
-    app_instance.pw_button = QPushButton('Browse Pathwise CSV')
+    layout.addWidget(QLabel("Select Second CSV File"))
+    app_instance.pw_button = QPushButton('Browse Second CSV')
     app_instance.pw_button.clicked.connect(app_instance.load_pw_csv)
     layout.addWidget(app_instance.pw_button)
 
@@ -103,10 +103,10 @@ def init_ui(app_instance):
     app_instance.progress_bar.setTextVisible(True)
     bottom_layout.addWidget(app_instance.progress_bar)
 
-    app_instance.pw_count_label = QLabel("Pathwise Count: 0")
+    app_instance.pw_count_label = QLabel("First File Rows: 0")
     bottom_layout.addWidget(app_instance.pw_count_label, alignment=Qt.AlignRight)
 
-    app_instance.inno_count_label = QLabel("Innolink Count: 0")
+    app_instance.inno_count_label = QLabel("Second File Rows: 0")
     bottom_layout.addWidget(app_instance.inno_count_label, alignment=Qt.AlignRight)
 
     app_instance.error_count_label = QLabel("Errors: 0")

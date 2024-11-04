@@ -101,7 +101,12 @@ class BELComparator:
             merged_df['DIFF'] = merged_df['DIFF'].apply(self.format_diff_column)
 
             # 최종 결과를 반환합니다.
-            result = merged_df[['ROW', 'INDEX', 'POL_NO', 'RIDER_PRD_CODE', 'PATHWISE_BEL', 'INNOLINC_BEL', 'DIFF']]
+            result = merged_df[['ROW', 'INDEX', 'POL_NO', 'RIDER_PRD_CODE', 'PATHWISE_BEL', 'INNOLINC_BEL', 'DIFF']].rename(
+                columns={
+                    'PATHWISE_BEL': 'ANSWER_BEL',
+                    'INNOLINC_BEL': 'INPUT_BEL',
+                }
+            )            
             return result
         except Exception as e:
             raise e
